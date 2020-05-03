@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: influxdb
+spec:
+  serviceName: "influxdb"
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: influxdb      
+  template:
+    metadata:
+      labels:
+        k8s-app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:1.7
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /var/lib/influxdb
+          name: influxdb-storage
+      volumes:
+      - name: influxdb-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-influxdb-n0milet
+spec:
+  type: ClusterIP
+  selector:
+    k8s-app: influxdb
+  ports:
+    - name: https
+      port: 8086
+      targetPort: 8086

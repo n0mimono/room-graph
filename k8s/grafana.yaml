@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+spec:
+  serviceName: "grafana"
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: grafana      
+  template:
+    metadata:
+      labels:
+        k8s-app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:6.6.0-beta1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-storage
+      volumes:
+      - name: grafana-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-grafana-n0milet
+spec:
+  type: LoadBalancer
+  selector:
+    k8s-app: grafana
+  ports:
+  - name: https
+    port: 3000
+    targetPort: 3000
